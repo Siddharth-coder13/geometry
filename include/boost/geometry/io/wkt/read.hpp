@@ -453,32 +453,6 @@ struct polygon_parser
     }
 };
 
-template<typename PolyhedralSurface>
-struct polyhderal_surface_parser
-{
-    typedef typename ring_return_type<PolyhedralSurface>::type ring_return_type;
-    typedef container_appender<ring_return_type> appender;
-
-    static inline void apply(tokenizer::iterator& it,
-                             tokenizer::iterator const& end,
-                             std::string const& wkt,
-                             PolyhedralSurface& Poly)
-    {
-        handle_open_parenthesis(it, end, wkt);
-        typename ring_type<PolyhedralSurface>::type ring;
-        while(it != end && *it != ")"){
-            appender::apply(it, end, wkt, ring);
-            if(it!=end && *it == ",")
-            {
-                //skip after ring is parsed
-                ++it;
-            }
-
-        }
-        handle_close_parenthesis(it, end, wkt);
-    }
-};
-
 
 inline bool one_of(tokenizer::iterator const& it,
                    std::string const& value,
@@ -870,15 +844,6 @@ struct read_wkt<polygon_tag, Geometry>
         >
 {};
 
-template <typename Geometry>
-struct read_wkt<polyhedral_surface_tag, Geometry>
-    : detail::wkt::geometry_parser
-        < 
-            Geometry,
-            detail::wkt::polyhderal_surface_parser,
-            detail::wkt::prefix_polyhedral_surface
-        >
-{};
 
 template <typename MultiGeometry>
 struct read_wkt<multi_point_tag, MultiGeometry>
